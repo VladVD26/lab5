@@ -14,12 +14,12 @@ def read_first_sentence(filename):
     return None
 
 def sort_words(sentence):
-    phrases = re.findall(r"'([^']+)'", sentence)  # Знаходимо фрази у лапках
-    remaining_text = re.sub(r"'([^']+)'", "", sentence)  # Видаляємо фрази з тексту
-    words = re.findall(r'\b[\wА-Яа-яЄєІіЇїҐґ]+\b', remaining_text)  # Виділяємо окремі слова
+    phrases = re.findall(r"'([^']+)'", sentence)  
+    remaining_text = re.sub(r"'([^']+)'", "", sentence)  
+    words = re.findall(r'\b[\wА-Яа-яЄєІіЇїҐґ]+\b', remaining_text)  
     
-    words.extend(phrases)  # Додаємо фрази до списку слів
-    words.sort()  # Використовуємо стандартне сортування Python
+    words.extend(phrases)  
+    words.sort() 
     return words
 
 def main():
