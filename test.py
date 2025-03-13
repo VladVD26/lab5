@@ -1,38 +1,42 @@
 import re
-import string
 
 def read_first_sentence(filename):
+    """Зчитує перше речення з файлу"""
     try:
-        with open(filename, 'r', encoding='utf-8') as file:
+        with open(filename, "r", encoding="utf-8") as file:
             text = file.read()
-            first_sentence = re.split(r'(?<=[.!?])\s+', text.strip())[0]
-            return first_sentence
+            sentences = re.split(r'(?<=[.!?])\s+', text) 
+            return sentences[0] if sentences else ""
     except FileNotFoundError:
         print("Помилка: Файл не знайдено.")
+        return ""
     except Exception as e:
         print(f"Помилка: {e}")
-    return None
+        return ""
 
-def sort_words(sentence):
-    phrases = re.findall(r"'([^']+)'", sentence)  
-    remaining_text = re.sub(r"'([^']+)'", "", sentence)  
-    words = re.findall(r'\b[\wА-Яа-яЄєІіЇїҐґ]+\b', remaining_text)  
-    
-    words.extend(phrases)  
-    words.sort() 
+def extract_words(sentence):
+    """Видаляє пунктуацію і повертає список слів/фраз"""
+    words = re.findall(r'\b[а-яА-ЯіїєґІЇЄҐa-zA-Z]+(?:\s[а-яА-ЯіїєґІЇЄҐa-zA-Z]+)?\b', sentence)
     return words
 
-def main():
-    filename = "text.txt"
-    sentence = read_first_sentence(filename)
-    
-    if sentence:
-        print("Перше речення:", sentence)
-        sorted_words = sort_words(sentence)
-        print("Відсортовані слова:", sorted_words)
-        print("Кількість слів:", len(sorted_words))
-    else:
-        print("Не вдалося зчитати речення з файлу.")
+def custom_sort(words):
+    """Сортує спочатку українські слова, потім англійські"""
+    ukr_words = sorted(
+        [w for w in words if re.match(r'^[а-яА-ЯіїєґІЇЄҐ]', w)], key=lambda w: w.lower()
+    )
+    eng_words = sorted(
+        [w for w in words if re.match(r'^[a-zA-Z]', w)], key=lambda w: w.lower()
+    )
+    return ukr_words + eng_words
 
-if __name__ == "__main__":
-    main()
+filename = "text.txt"
+sentence = read_first_sentence(filename)
+
+if sentence:
+    print(f"Перше речення: {sentence}")
+    
+    words = extract_words(sentence)
+    sorted_words = custom_sort(words)
+    
+    print("Відсортований список:", sorted_words)
+    print("Кількість слів:", len(words))
