@@ -1,18 +1,15 @@
 import re
 
 def sort_words(words):
-    # Розділяємо слова на українські та англійські
     ukrainian_words = []
     english_words = []
     
     for word in words:
-        # Перевіряємо, чи слово містить кириличні символи
         if re.search('[а-яА-ЯїЇіІєЄ]', word):
             ukrainian_words.append(word)
         else:
             english_words.append(word)
-    
-    # Сортуємо окремо
+
     ukrainian_words.sort(key=lambda x: x.lower())
     english_words.sort(key=lambda x: x.lower())
     
@@ -23,14 +20,11 @@ def process_text_file(filename):
         with open(filename, 'r', encoding='utf-8') as file:
             content = file.read()
             
-            # Виділяємо перше речення
             first_sentence = re.split(r'[.!?]', content)[0].strip()
             print("Перше речення:", first_sentence)
             
-            # Видаляємо пунктуацію та розбиваємо на слова
             words = re.findall(r'\b[а-яА-ЯїЇіІєЄa-zA-Z]+\b', content)
             
-            # Сортуємо слова
             sorted_words = sort_words(words)
             
             print("\nВідсортовані слова:")
