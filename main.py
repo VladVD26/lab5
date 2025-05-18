@@ -1,42 +1,48 @@
 import re
 
-def read_first_sentence(filename):
-    """Зчитує перше речення з файлу"""
+def sort_words(words):
+    # Розділяємо слова на українські та англійські
+    ukrainian_words = []
+    english_words = []
+    
+    for word in words:
+        # Перевіряємо, чи слово містить кириличні символи
+        if re.search('[а-яА-ЯїЇіІєЄ]', word):
+            ukrainian_words.append(word)
+        else:
+            english_words.append(word)
+    
+    # Сортуємо окремо
+    ukrainian_words.sort(key=lambda x: x.lower())
+    english_words.sort(key=lambda x: x.lower())
+    
+    return ukrainian_words + english_words
+
+def process_text_file(filename):
     try:
-        with open(filename, "r", encoding="utf-8") as file:
-            text = file.read()
-            sentences = re.split(r'(?<=[.!?])\s+', text) 
-            return sentences[0] if sentences else ""
+        with open(filename, 'r', encoding='utf-8') as file:
+            content = file.read()
+            
+            # Виділяємо перше речення
+            first_sentence = re.split(r'[.!?]', content)[0].strip()
+            print("Перше речення:", first_sentence)
+            
+            # Видаляємо пунктуацію та розбиваємо на слова
+            words = re.findall(r'\b[а-яА-ЯїЇіІєЄa-zA-Z]+\b', content)
+            
+            # Сортуємо слова
+            sorted_words = sort_words(words)
+            
+            print("\nВідсортовані слова:")
+            for word in sorted_words:
+                print(word)
+                
+            print("\nКількість слів:", len(words))
+            
     except FileNotFoundError:
-        print("Помилка: Файл не знайдено.")
-        return ""
+        print(f"Помилка: файл {filename} не знайдено")
     except Exception as e:
-        print(f"Помилка: {e}")
-        return ""
+        print(f"Сталася помилка: {str(e)}")
 
-def extract_words(sentence):
-    """Видаляє пунктуацію і повертає список слів/фраз"""
-    words = re.findall(r'\b[а-яА-ЯіїєґІЇЄҐa-zA-Z]+(?:\s[а-яА-ЯіїєґІЇЄҐa-zA-Z]+)?\b', sentence)
-    return words
-
-def custom_sort(words):
-    """Сортує спочатку українські слова, потім англійські"""
-    ukr_words = sorted(
-        [w for w in words if re.match(r'^[а-яА-ЯіїєґІЇЄҐ]', w)], key=lambda w: w.lower()
-    )
-    eng_words = sorted(
-        [w for w in words if re.match(r'^[a-zA-Z]', w)], key=lambda w: w.lower()
-    )
-    return ukr_words + eng_words
-
-filename = "text.txt"
-sentence = read_first_sentence(filename)
-
-if sentence:
-    print(f"Перше речення: {sentence}")
-    
-    words = extract_words(sentence)
-    sorted_words = custom_sort(words)
-    
-    print("Відсортований список:", sorted_words)
-    print("Кількість слів:", len(words))
+if __name__ == "__main__":
+    process_text_file("text.txt")
